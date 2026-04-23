@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factory Panic</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#000}
+
+#G{
+  width:100%;height:100%;min-height:620px;
+  position:relative;overflow:hidden;
+  font-family:'Rajdhani',sans-serif;
+  background:radial-gradient(ellipse at 50% 0%,#0a1628 0%,#020508 70%);
+}
+
+/* ── AMBIENT PARTICLES ── */
+#PARTICLES{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.PART{position:absolute;border-radius:50%;animation:PDRIFT linear infinite;opacity:0}
+@keyframes PDRIFT{
+  0%{opacity:0;transform:translateY(100%) translateX(0)}
+  10%{opacity:0.6}
+  90%{opacity:0.3}
+  100%{opacity:0;transform:translateY(-20%) translateX(40px)}
+}
+
+/* ── SCREENS ── */
+.SCR{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;overflow-y:auto}
+.SCR.H{display:none!important}
+.H{display:none!important}
+
+/* ── INTRO ── */
+#INTRO{
+  background:linear-gradient(160deg,#020810 0%,#040d1a 60%,#020508 100%);
+}
+#INTRO::before{
+  content:'';position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(0,180,255,0.015) 60px,rgba(0,180,255,0.015) 61px),
+    repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(0,180,255,0.015) 60px,rgba(0,180,255,0.015) 61px);
+  pointer-events:none;z-index:1;
+}
+#INTRO::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);
+  pointer-events:none;z-index:1;
+}
+
+.INTRO_INNER{
+  position:relative;z-index:10;
+  width:100%;max-width:660px;
+  padding:36px 32px;
+}
+
+.CORP_TAG{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:4px;
+  color:#f97316;border:1px solid rgba(249,115,22,0.4);
+  padding:5px 14px;border-radius:2px;
+  background:rgba(249,115,22,0.06);
+  margin-bottom:28px;
+}
+.CORP_TAG::before{content:'';width:6px;height:6px;background:#f97316;border-radius:50%;animation:BLINK 1.2s ease-in-out infinite}
+@keyframes BLINK{0%,100%{opacity:1}50%{opacity:0.2}}
+
+.STORY_H{
+  font-family:'Orbitron',monospace;
+  font-size:32px;font-weight:900;
+  line-height:1.15;margin-bottom:8px;
+  color:#fff;
+  text-shadow:0 0 40px rgba(0,180,255,0.3);
+}
+.STORY_H em{color:#f97316;font-style:normal;
+  text-shadow:0 0 20px rgba(249,115,22,0.6)}
+
+.STORY_LABEL{font-size:10px;letter-spacing:4px;color:#1e4060;margin-bottom:28px;text-transform:uppercase}
+
+.DIVLINE{
+  display:flex;align-items:center;gap:12px;margin-bottom:28px;
+}
+.DIVLINE::before,.DIVLINE::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(249,115,22,0.5),transparent)}
+.DIVLINE span{font-family:'Orbitron',monospace;font-size:8px;color:#f97316;letter-spacing:3px}
+
+.STORY_TEXT{font-size:13px;color:#7a9ab8;line-height:2.0;margin-bottom:28px}
+.STORY_TEXT p{margin-bottom:14px}
+.STORY_TEXT strong{color:#c0d4e8}
+.STORY_TEXT .RED{color:#f97316}
+.STORY_TEXT .GRN{color:#4ade80}
+.STORY_TEXT blockquote{
+  border-left:3px solid #f97316;padding:8px 16px;
+  color:#dde8f0;font-style:italic;font-size:12px;
+  background:rgba(249,115,22,0.04);border-radius:0 4px 4px 0;
+  margin:4px 0;
+}
+
+.STATS_GRID{display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap}
+.STAT_PILL{
+  flex:1;min-width:120px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:6px;padding:12px 14px;
+  position:relative;overflow:hidden;
+}
+.STAT_PILL::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,180,255,0.4),transparent)}
+.SP_L{font-size:8px;letter-spacing:2px;color:#2a4a6a;text-transform:uppercase;margin-bottom:5px}
+.SP_V{font-family:'Orbitron',monospace;font-size:14px;font-weight:500;color:#00b8ff}
+
+.BTN_GROUP{display:flex;gap:12px;flex-wrap:wrap}
+.BTN_PRI{
+  background:linear-gradient(135deg,#f97316,#ea580c);
+  border:none;color:#fff;
+  font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;
+  padding:14px 32px;cursor:pointer;border-radius:4px;
+  transition:all 0.2s;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(249,115,22,0.3);
+}
+.BTN_PRI::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);pointer-events:none}
+.BTN_PRI:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(249,115,22,0.5)}
+.BTN_SEC{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);
+  font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;
+  padding:14px 28px;cursor:pointer;border-radius:4px;
+  transition:all 0.2s;
+}
+.BTN_SEC:hover{border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.7)}
+
+/* ── TUTORIAL ── */
+#TSCREEN{background:linear-gradient(160deg,#020810 0%,#040d1a 60%,#020508 100%)}
+#TSCREEN::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(0,180,255,0.012) 60px,rgba(0,180,255,0.012) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(0,180,255,0.012) 60px,rgba(0,180,255,0.012) 61px);pointer-events:none}
+
+.TUT_INNER{position:relative;z-index:10;width:100%;max-width:660px;padding:28px 32px}
+.TUT_HEAD{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:#00b8ff;letter-spacing:4px;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.TUT_HEAD::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,180,255,0.3),transparent)}
+
+.TUT_GRID{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.TCARD{
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;padding:16px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s;
+}
+.TCARD::before{content:'';position:absolute;top:0;left:0;right:0;height:1px}
+.TCARD.ok::before{background:linear-gradient(90deg,transparent,rgba(74,222,128,0.6),transparent)}
+.TCARD.nd::before{background:linear-gradient(90deg,transparent,rgba(251,191,36,0.6),transparent)}
+.TCARD.bc::before{background:linear-gradient(90deg,transparent,rgba(249,115,22,0.6),transparent)}
+.TCARD.pk::before{background:linear-gradient(90deg,transparent,rgba(239,68,68,0.6),transparent)}
+.TC_ICO{font-size:28px;margin-bottom:10px}
+.TC_H{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;font-weight:700;margin-bottom:6px}
+.TC_B{font-size:11px;color:#5a7a9a;line-height:1.8}
+
+.SCORE_CARD{
+  background:rgba(255,255,255,0.015);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:10px;padding:14px 16px;
+  margin-bottom:20px;
+}
+.SCORE_ROW{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px}
+.SCORE_ROW:last-child{border:none}
+.SR_L{color:#4a6a8a}
+.SR_V{font-family:'Orbitron',monospace;font-size:12px;font-weight:700}
+
+/* ── HUD ── */
+#HUD{
+  position:absolute;top:0;left:0;right:0;z-index:50;
+  height:54px;
+  background:rgba(2,5,12,0.9);
+  border-bottom:1px solid rgba(0,180,255,0.15);
+  display:flex;align-items:stretch;
+  backdrop-filter:blur(10px);
+}
+#HUD::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,180,255,0.4),transparent)}
+
+.HB{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,0.04);position:relative}
+.HB:last-child{border-right:none}
+.HL_T{font-size:7px;letter-spacing:3px;color:#1e3a5a;text-transform:uppercase;margin-bottom:2px}
+.HV_T{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:#00b8ff;line-height:1}
+#ht_v{color:#ff6b35}
+#hlv_v{color:#a855f7}
+#htg_v{color:#ffd700}
+
+/* ── GAME AREA ── */
+#ARENA{position:absolute;top:54px;left:0;right:0;bottom:0}
+
+/* factory floor bg */
+#FLOOR{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,#030912 0%,#050e1e 40%,#040b18 100%);
+  overflow:hidden;
+}
+#FLOOR::before{
+  content:'';position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(0,60,120,0.08) 79px,rgba(0,60,120,0.08) 80px),
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(0,60,120,0.06) 59px,rgba(0,60,120,0.06) 60px);
+}
+
+/* ── BELT 3D ── */
+#BELT_SECTION{
+  position:absolute;top:0;left:0;right:0;height:185px;
+  perspective:800px;
+}
+
+#BELT_3D{
+  position:absolute;top:14px;left:0;right:0;height:145px;
+  transform:rotateX(6deg);
+  transform-origin:top center;
+}
+
+/* belt frame */
+#BELT_FRAME{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#0a1828 0%,#060e1c 50%,#0a1828 100%);
+  border-top:4px solid #0d2040;
+  border-bottom:4px solid #0d2040;
+}
+#BELT_FRAME::before{
+  content:'';position:absolute;
+  top:-8px;left:0;right:0;height:8px;
+  background:linear-gradient(180deg,#152840,#0a1828);
+  border-radius:4px 4px 0 0;
+}
+#BELT_FRAME::after{
+  content:'';position:absolute;
+  bottom:-8px;left:0;right:0;height:8px;
+  background:linear-gradient(180deg,#0a1828,#152840);
+  border-radius:0 0 4px 4px;
+}
+
+/* belt surface moving stripes */
+#BELT_SURFACE{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    90deg,
+    #0c1e34 0px, #0c1e34 50px,
+    #081628 50px, #081628 100px
+  );
+  animation:BMOVE 0.22s linear infinite;
+}
+@keyframes BMOVE{to{background-position:-100px 0}}
+
+/* belt ribs */
+#BELT_RIBS{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 48px,
+    rgba(255,255,255,0.04) 48px,
+    rgba(255,255,255,0.04) 50px
+  );
+  animation:BMOVE 0.22s linear infinite;
+}
+
+/* belt edge glow */
+#BELT_GLOW_T{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(0,180,255,0.3),rgba(0,180,255,0.6),rgba(0,180,255,0.3),transparent);animation:BGLOW 2s ease-in-out infinite}
+#BELT_GLOW_B{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(0,180,255,0.2),rgba(0,180,255,0.4),rgba(0,180,255,0.2),transparent);animation:BGLOW 2s ease-in-out infinite 0.5s}
+@keyframes BGLOW{0%,100%{opacity:0.5}50%{opacity:1}}
+
+/* roller ends — spinning wheels */
+.ROLLER{
+  position:absolute;top:-6px;bottom:-6px;width:22px;
+  background:linear-gradient(180deg,#1e3a5e,#0a1e36,#1e3a5e);
+  border:1px solid rgba(0,180,255,0.25);
+  z-index:3;overflow:hidden;
+}
+.ROLLER::before{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent 0px,transparent 8px,
+    rgba(0,180,255,0.15) 8px,rgba(0,180,255,0.15) 10px
+  );
+  animation:ROLLER_SPIN 0.18s linear infinite;
+}
+.ROLLER::after{
+  content:'';
+  position:absolute;left:50%;top:0;bottom:0;width:2px;
+  transform:translateX(-50%);
+  background:rgba(0,180,255,0.2);
+}
+@keyframes ROLLER_SPIN{from{background-position:0 0}to{background-position:0 -18px}}
+#ROLLER_L{left:0;border-radius:3px 0 0 3px;box-shadow:inset 2px 0 6px rgba(0,0,0,0.5),2px 0 10px rgba(0,180,255,0.1)}
+#ROLLER_R{right:0;border-radius:0 3px 3px 0;box-shadow:inset -2px 0 6px rgba(0,0,0,0.5),-2px 0 10px rgba(0,180,255,0.1)}
+/* speed up roller spin to match belt speed */
+.roller-fast::before{animation-duration:0.08s!important}
+.roller-vfast::before{animation-duration:0.04s!important}
+
+/* scanner */
+#SCANNER{
+  position:absolute;left:90px;top:-8px;width:3px;height:160px;
+  background:linear-gradient(180deg,transparent,rgba(0,255,220,0.8),rgba(0,255,220,0.4),transparent);
+  z-index:20;pointer-events:none;
+  animation:SCAN 1.6s ease-in-out infinite;
+  box-shadow:0 0 8px rgba(0,255,220,0.4);
+}
+@keyframes SCAN{0%,100%{opacity:0.1}50%{opacity:1}}
+#SCAN_HEAD{
+  position:absolute;left:82px;top:-8px;
+  width:18px;height:18px;
+  background:linear-gradient(135deg,#0a2840,#0d3050);
+  border:1px solid rgba(0,255,220,0.5);
+  border-radius:3px;z-index:21;
+  box-shadow:0 0 10px rgba(0,255,220,0.3);
+}
+
+/* pkg zone */
+#PKG_ZONE{
+  position:absolute;top:14px;left:0;right:0;height:145px;
+  overflow:visible;z-index:10;
+}
+
+/* progress */
+#PROG_WRAP{
+  position:absolute;top:168px;left:16px;right:16px;z-index:20;
+}
+#PROG_TRACK{height:4px;background:rgba(255,255,255,0.05);border-radius:2px;position:relative;overflow:hidden}
+#PROG_FILL{height:100%;background:linear-gradient(90deg,#f97316,#ffd700);border-radius:2px;width:0%;transition:width 0.2s;position:relative}
+#PROG_FILL::after{content:'';position:absolute;right:0;top:-2px;width:8px;height:8px;background:#ffd700;border-radius:50%;box-shadow:0 0 8px #ffd700}
+#PROG_LABELS{display:flex;justify-content:space-between;margin-top:4px}
+#PROG_TXT{font-size:10px;color:#1e3a5a;letter-spacing:1px}
+#COMBO_TXT{font-size:10px;font-family:'Orbitron',monospace;color:#fbbf24;letter-spacing:1px}
+
+/* ── BINS SECTION ── */
+#BINS_WRAP{
+  position:absolute;bottom:0;left:0;right:0;height:210px;
+  background:linear-gradient(180deg,rgba(2,5,12,0) 0%,rgba(2,5,12,0.95) 20%,#020508 100%);
+  display:flex;align-items:center;justify-content:center;
+  gap:14px;padding:0 16px 16px;
+  z-index:15;
+}
+
+.BIN_3D{
+  flex:1;max-width:175px;height:180px;
+  position:relative;cursor:default;
+  transition:transform 0.15s;
+}
+.BIN_3D.OV{transform:scale(1.04) translateY(-4px)}
+.BIN_3D.OV .BIN_BODY{box-shadow:0 0 30px var(--bc)}
+
+.BIN_BODY{
+  width:100%;height:100%;
+  border-radius:12px;
+  border:1px solid var(--bc);
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:8px;position:relative;overflow:hidden;
+  transition:box-shadow 0.15s;
+}
+.BIN_BODY::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--bc),transparent)}
+.BIN_BODY::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.04) 0%,transparent 70%)}
+
+/* 3D bottom face */
+.BIN_SHADOW{
+  position:absolute;bottom:-8px;left:6px;right:6px;height:8px;
+  background:var(--bc);opacity:0.15;
+  border-radius:0 0 8px 8px;
+  filter:blur(4px);
+}
+
+.BIN_ICON{font-size:38px;line-height:1;position:relative;z-index:2;filter:drop-shadow(0 0 8px var(--bc))}
+.BIN_NAME{
+  font-family:'Orbitron',monospace;font-size:9px;
+  letter-spacing:2px;font-weight:700;
+  color:var(--tc);text-align:center;line-height:1.6;
+  position:relative;z-index:2;
+}
+.BIN_DESC{font-size:9px;color:var(--tc);opacity:0.45;text-align:center;padding:0 8px;line-height:1.4;position:relative;z-index:2}
+
+#bin_N{--bc:rgba(251,191,36,0.5);--bg:rgba(251,191,36,0.04);--tc:#fbbf24}
+#bin_B{--bc:rgba(249,115,22,0.5);--bg:rgba(249,115,22,0.04);--tc:#f97316}
+#bin_P{--bc:rgba(239,68,68,0.5);--bg:rgba(239,68,68,0.04);--tc:#ef4444}
+
+/* ── PACKAGES 3D ── */
+.PKG{
+  position:absolute;
+  width:84px;height:108px;
+  top:50%;transform:translateY(-50%);
+  cursor:grab;z-index:15;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,0.6));
+  transition:filter 0.1s;
+  user-select:none;
+}
+.PKG:hover{filter:drop-shadow(0 12px 24px rgba(0,0,0,0.8)) drop-shadow(0 0 8px rgba(255,255,255,0.1))}
+.PKG.DRAG{cursor:grabbing;opacity:0.75;z-index:99;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.9))}
+
+.PKG_INNER{
+  width:100%;height:100%;
+  border-radius:8px;overflow:hidden;
+  display:flex;flex-direction:column;
+  position:relative;
+  /* 3D via multiple borders/shadows */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset -2px 0 0 rgba(0,0,0,0.3),
+    inset 0 -2px 0 rgba(0,0,0,0.3),
+    2px 4px 12px rgba(0,0,0,0.5),
+    4px 8px 24px rgba(0,0,0,0.3);
+}
+
+/* right face 3D */
+.PKG_INNER::after{
+  content:'';position:absolute;
+  right:-6px;top:4px;bottom:4px;width:6px;
+  background:rgba(0,0,0,0.35);
+  border-radius:0 4px 4px 0;
+  transform:skewY(0deg);
+}
+
+.PKG_TOP_LABEL{
+  padding:5px 5px 3px;
+  text-align:center;font-size:7.5px;font-weight:700;
+  letter-spacing:0.8px;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex-shrink:0;
+  position:relative;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+.PKG_BODY{
+  flex:1;display:flex;align-items:center;
+  justify-content:center;position:relative;
+  font-size:26px;overflow:hidden;
+}
+.PKG_BODY::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:30%;
+  background:linear-gradient(180deg,rgba(255,255,255,0.06),transparent);
+  pointer-events:none;
+}
+.PKG_BOTTOM{
+  padding:3px 4px 5px;
+  display:flex;flex-direction:column;
+  align-items:center;gap:1px;flex-shrink:0;
+  position:relative;
+  box-shadow:inset 0 1px 0 rgba(0,0,0,0.2);
+}
+.BC_STRIP{
+  width:72px;height:16px;
+  background:#fff;border-radius:2px;
+  display:flex;align-items:flex-end;
+  gap:1px;padding:1px 2px;
+}
+.BC_MISS{
+  width:72px;height:16px;
+  background:rgba(249,115,22,0.1);
+  border:1.5px dashed rgba(249,115,22,0.7);
+  border-radius:2px;
+  display:flex;align-items:center;justify-content:center;
+}
+.PKG_PROD_NAME{font-size:6px;color:rgba(255,255,255,0.25);letter-spacing:0.3px}
+
+/* damage cracks */
+.CRACK_SVG{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* ── FLOATING FEEDBACK ── */
+.FLOAT{
+  position:absolute;
+  font-family:'Orbitron',monospace;
+  font-size:14px;font-weight:900;
+  pointer-events:none;z-index:80;white-space:nowrap;
+  animation:FLOATANIM 0.9s ease-out forwards;
+  text-shadow:0 0 10px currentColor;
+}
+@keyframes FLOATANIM{
+  0%{opacity:1;transform:translateY(0) scale(1.1)}
+  100%{opacity:0;transform:translateY(-60px) scale(0.8)}
+}
+
+/* ── SHIFT ANNOUNCE ── */
+#ANNOUNCE{
+  position:absolute;inset:0;z-index:60;
+  background:rgba(2,5,12,0.92);
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+#ANNOUNCE.H{display:none}
+.ANN_INNER{text-align:center}
+.ANN_SHIFT{
+  font-family:'Orbitron',monospace;
+  font-size:11px;letter-spacing:5px;
+  color:#f97316;margin-bottom:12px;
+  animation:ANNFADE 2.2s ease-out forwards;
+}
+.ANN_TITLE{
+  font-family:'Orbitron',monospace;
+  font-size:28px;font-weight:900;color:#fff;
+  margin-bottom:10px;
+  animation:ANNSLIDE 2.2s ease-out forwards;
+  text-shadow:0 0 30px rgba(0,180,255,0.5);
+}
+.ANN_SUB{
+  font-size:13px;color:#ffd700;
+  letter-spacing:2px;
+  animation:ANNFADE 2.2s ease-out forwards 0.2s;
+  opacity:0;
+}
+@keyframes ANNSLIDE{
+  0%{opacity:0;transform:translateY(20px) scale(0.9)}
+  20%{opacity:1;transform:translateY(0) scale(1)}
+  80%{opacity:1}
+  100%{opacity:0}
+}
+@keyframes ANNFADE{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
+
+/* ── END SCREEN ── */
+#OVS{background:linear-gradient(160deg,#020810,#040d1a,#020508)}
+#OVS::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(0,180,255,0.012) 60px,rgba(0,180,255,0.012) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(0,180,255,0.012) 60px,rgba(0,180,255,0.012) 61px);pointer-events:none}
+
+.END_WRAP{position:relative;z-index:2;max-width:460px;width:100%;padding:36px 28px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.END_BADGE{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:4px;color:#f97316;border:1px solid rgba(249,115,22,0.3);display:inline-block;padding:4px 12px;border-radius:2px;background:rgba(249,115,22,0.06);margin-bottom:16px}
+.END_TITLE{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;margin-bottom:4px}
+.END_LINE{width:80px;height:1px;background:linear-gradient(90deg,transparent,#f97316,transparent);margin:16px 0}
+.END_SCORE{font-family:'Orbitron',monospace;font-size:54px;font-weight:900;color:#00b8ff;line-height:1;text-shadow:0 0 30px rgba(0,180,255,0.4);margin-bottom:4px}
+.END_SCORE_L{font-size:11px;letter-spacing:3px;color:#1e3a5a;margin-bottom:24px}
+.END_STATS{font-size:12px;color:#3a5a7a;line-height:2.4;margin-bottom:28px;text-align:center}
+.END_STATS strong{color:#7a9ab8}
+.END_GRADE{
+  font-family:'Orbitron',monospace;
+  font-size:56px;font-weight:900;
+  line-height:1;margin:8px 0 24px;
+  filter:drop-shadow(0 0 20px currentColor);
+}
+
+#PAUSE_OVL:not(.H){display:flex}
+#PAUSE_OVL.H{display:none!important}
+
+/* bin fill animation */
+.BIN_FILL{
+  position:absolute;bottom:0;left:0;right:0;height:0%;
+  border-radius:0 0 10px 10px;
+  transition:height 0.4s ease,opacity 0.4s ease;
+  pointer-events:none;
+  z-index:3;
+}
+#bin_N .BIN_FILL{background:rgba(251,191,36,0.35)}
+#bin_B .BIN_FILL{background:rgba(249,115,22,0.35)}
+#bin_P .BIN_FILL{background:rgba(239,68,68,0.35)}
+
+/* touch selected package */
+.PKG.SELECTED{
+  filter:drop-shadow(0 0 12px rgba(0,212,255,0.9)) drop-shadow(0 8px 16px rgba(0,0,0,0.6))!important;
+  z-index:50!important;
+}
+
+/* mobile touch hint */
+#TOUCH_HINT{
+  position:absolute;top:180px;left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:2px;color:#1e3a5a;
+  z-index:12;pointer-events:none;white-space:nowrap;
+}
+
+/* bin tap highlight for mobile */
+.BIN_3D.TAP_READY{
+  transform:scale(1.04) translateY(-4px);
+  box-shadow:0 0 22px rgba(0,212,255,0.4);
+}
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:600px){
+  #HUD{height:42px}
+  .HV_T{font-size:14px}
+  .HL_T{font-size:6px}
+  #btn_pause,#btn_mute{width:26px!important;height:26px!important;font-size:11px!important}
+  #BELT_SECTION{height:150px}
+  #BELT_3D{top:10px;height:118px;transform:rotateX(3deg)}
+  #PKG_ZONE{top:10px;height:118px}
+  #PROG_WRAP{top:130px}
+  #BINS_WRAP{height:175px;gap:8px;padding:0 8px 10px}
+  .BIN_3D{height:148px;max-width:none}
+  .BIN_ICON{font-size:26px!important}
+  .BIN_NAME{font-size:8px!important;letter-spacing:1px!important}
+  .BIN_DESC{display:none}
+  #ARENA{top:42px}
+  #FACTORY_BG{bottom:170px!important;height:100px!important}
+  #TOUCH_HINT{top:148px;font-size:8px}
+}
+@media(max-width:400px){
+  #BINS_WRAP{height:155px;gap:5px;padding:0 5px 8px}
+  .BIN_3D{height:130px}
+  .BIN_ICON{font-size:22px!important}
+  .BIN_NAME{font-size:7px!important}
+}
+
+@keyframes WL_BLINK{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes WL_BLINK_FAST{0%,100%{opacity:0.2}50%{opacity:1}}
+.wl-active{animation:WL_BLINK 1.2s ease-in-out infinite}
+.wl-panic{animation:WL_BLINK_FAST 0.35s ease-in-out infinite}
+
+/* timer warning flash */
+@keyframes TIMER_WARN{
+  0%,100%{color:#ff6b35}
+  50%{color:#ff0000;text-shadow:0 0 12px #ff0000}
+}
+.TIME_WARN{animation:TIMER_WARN 0.5s ease-in-out infinite!important}
+
+/* package slide-in entry */
+@keyframes PKG_ENTER{
+  0%{transform:translateY(-50%) translateX(30px) scale(0.85);opacity:0}
+  60%{transform:translateY(-50%) translateX(-4px) scale(1.04);opacity:1}
+  100%{transform:translateY(-50%) translateX(0) scale(1);opacity:1}
+}
+.PKG_ENTERING{animation:PKG_ENTER 0.22s cubic-bezier(0.2,0.8,0.4,1) forwards}
+
+/* queue preview fade */
+#QUEUE_ZONE .PKG{opacity:0.35!important;pointer-events:none!important}
+</style>
+</head>
+<body>
+<div id="G">
+
+<!-- ambient particles -->
+<div id="PARTICLES"></div>
+
+<!-- ═══ SCREEN 1: STORY ═══ -->
+<div id="INTRO" class="SCR">
+<div class="INTRO_INNER">
+  <div class="CORP_TAG">NEXACORP INDUSTRIES &mdash; FACILITY 7</div>
+  <div class="STORY_H">Day One.<br>Don't <em>Screw</em> It Up.</div>
+  <div class="STORY_LABEL">YOUR STORY STARTS NOW</div>
+  <div class="DIVLINE"><span>CLASSIFIED BRIEFING</span></div>
+  <div class="STORY_TEXT">
+    <p>It is <strong>6:04 AM</strong> at the NexaCorp distribution facility. The loading dock smells of cardboard and machine oil. You are the <strong class="RED">new Quality Control Inspector</strong> &mdash; hired on a probationary contract. Your supervisor, Chief Okafor, gave you exactly one sentence of training:</p>
+    <blockquote>"Bad packages leave this floor, you leave this job."</blockquote>
+    <p>The machines have been <strong class="RED">acting up all week</strong>. Mislabelled goods. Missing barcodes. Crushed boxes. Someone on the night shift let <strong>47 defective packages</strong> slip through to customers. There were complaints. Refunds. Management is furious.</p>
+    <p>Now the belt is running again and <strong class="GRN">you are the last line of defence</strong>. Every package that passes your station must be clean. Catch the bad ones. Let the good ones through. Prove you belong here.</p>
+  </div>
+  <div class="STATS_GRID">
+    <div class="STAT_PILL"><div class="SP_L">FACILITY</div><div class="SP_V">NEXACORP-7</div></div>
+    <div class="STAT_PILL"><div class="SP_L">YOUR ROLE</div><div class="SP_V">QC INSPECTOR</div></div>
+    <div class="STAT_PILL"><div class="SP_L">STATUS</div><div class="SP_V" style="color:#f97316">PROBATION</div></div>
+  </div>
+  <div class="BTN_GROUP">
+    <button class="BTN_PRI" id="btn_continue" onclick="show('TSCREEN')">CONTINUE &rarr;</button>
+    <button class="BTN_SEC" onclick="show('CREDITS')">CREDITS</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ SCREEN 2: TUTORIAL ═══ -->
+<div id="TSCREEN" class="SCR H">
+<div class="TUT_INNER">
+  <div class="TUT_HEAD">INSPECTOR BRIEFING</div>
+  <div class="TUT_GRID">
+    <div class="TCARD ok">
+      <div class="TC_ICO">✅</div>
+      <div class="TC_H" style="color:#4ade80">CLEAN PACKAGE</div>
+      <div class="TC_B">No defects. <strong style="color:#4ade80">Let it pass</strong> &mdash; you earn <strong style="color:#4ade80">+5 pts</strong> when it exits left.</div>
+    </div>
+    <div class="TCARD nd">
+      <div class="TC_ICO">🏷</div>
+      <div class="TC_H" style="color:#fbbf24">NAME DEFECT</div>
+      <div class="TC_B">Label reads <strong style="color:#fbbf24">???</strong>. Drag to the <strong style="color:#fbbf24">NAME DEFECT</strong> bin.</div>
+    </div>
+    <div class="TCARD bc">
+      <div class="TC_ICO">📊</div>
+      <div class="TC_H" style="color:#f97316">BARCODE DEFECT</div>
+      <div class="TC_B">Red <strong style="color:#f97316">✕</strong> where barcode should be. Drag to <strong style="color:#f97316">BARCODE DEFECT</strong> bin.</div>
+    </div>
+    <div class="TCARD pk">
+      <div class="TC_ICO">📦</div>
+      <div class="TC_H" style="color:#ef4444">PACKAGE DEFECT</div>
+      <div class="TC_B">Red <strong style="color:#ef4444">cracks</strong> across the box. Drag to <strong style="color:#ef4444">PACKAGE DEFECT</strong> bin.</div>
+    </div>
+  </div>
+  <div class="SCORE_CARD">
+    <div class="SCORE_ROW"><div class="SR_L">Clean package passes untouched</div><div class="SR_V" style="color:#4ade80">+5 pts</div></div>
+    <div class="SCORE_ROW"><div class="SR_L">Defective package sorted correctly</div><div class="SR_V" style="color:#4ade80">+5 pts</div></div>
+    <div class="SCORE_ROW"><div class="SR_L">3-in-a-row combo bonus</div><div class="SR_V" style="color:#fbbf24">+5 extra</div></div>
+    <div class="SCORE_ROW"><div class="SR_L">Wrong bin</div><div class="SR_V" style="color:#ef4444">-5 pts</div></div>
+    <div class="SCORE_ROW"><div class="SR_L">Defective package allowed to pass</div><div class="SR_V" style="color:#ef4444">-5 pts</div></div>
+    <div class="SCORE_ROW"><div class="SR_L">Clean package dragged into any bin</div><div class="SR_V" style="color:#ef4444">-5 pts</div></div>
+  </div>
+  <div class="BTN_GROUP">
+    <button class="BTN_SEC" onclick="show('INTRO')">&larr; BACK</button>
+    <button class="BTN_PRI" onclick="startGame()">START SHIFT &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ SCREEN 3: GAME ═══ -->
+<div id="GMS" class="SCR H" style="padding:0;align-items:stretch;justify-content:flex-start">
+  <div id="HUD">
+    <div class="HB"><div class="HL_T">SCORE</div><div class="HV_T" id="hs">0</div></div>
+    <div class="HB"><div class="HL_T">SHIFT</div><div class="HV_T" id="hlv_v">1</div></div>
+    <div class="HB"><div class="HL_T">TIME</div><div class="HV_T" id="ht_v">60</div></div>
+    <div class="HB"><div class="HL_T">TARGET</div><div class="HV_T" id="htg_v">100</div></div>
+    <div class="HB" style="flex:0.6">
+      <button id="btn_pause" onclick="togglePause()" title="Pause" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:#4a7a9a;font-size:14px;width:32px;height:32px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center">⏸</button>
+    </div>
+    <div class="HB" style="flex:0.6">
+      <button id="btn_mute" onclick="toggleMute()" title="Mute" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:#4a7a9a;font-size:14px;width:32px;height:32px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center">🔊</button>
+    </div>
+    <div class="HB" style="flex:0.6">
+      <button onclick="toggleFullscreen()" title="Fullscreen" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:#4a7a9a;font-size:13px;width:32px;height:32px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center">⛶</button>
+    </div>
+  </div>
+  <div id="ARENA">
+    <div id="FLOOR">
+      <!-- Factory background silhouettes -->
+      <svg id="FACTORY_BG" style="position:absolute;bottom:198px;left:0;right:0;width:100%;height:140px;pointer-events:none;opacity:0.55;transition:filter 2s ease" viewBox="0 0 800 120" preserveAspectRatio="xMidYMax meet">
+        <!-- robotic arm left -->
+        <rect x="30" y="40" width="8" height="60" fill="#1a3a5a"/>
+        <rect x="18" y="36" width="32" height="10" rx="2" fill="#1a3a5a"/>
+        <rect x="38" y="20" width="6" height="28" fill="#1a3a5a"/>
+        <rect x="34" y="16" width="14" height="8" rx="2" fill="#1a3a5a"/>
+        <circle cx="41" cy="16" r="5" fill="#0d2a40"/>
+        <!-- machine panel left -->
+        <rect x="70" y="30" width="50" height="70" rx="3" fill="#0f2235"/>
+        <rect x="75" y="36" width="16" height="12" rx="1" fill="#0a1828"/>
+        <rect x="96" y="36" width="16" height="12" rx="1" fill="#0a1828"/>
+        <rect x="75" y="54" width="37" height="4" rx="1" fill="#0a1828"/>
+        <rect x="75" y="62" width="37" height="4" rx="1" fill="#0a1828"/>
+        <circle cx="84" cy="76" r="4" fill="#0a1828"/>
+        <circle cx="95" cy="76" r="4" fill="#0a1828"/>
+        <circle cx="106" cy="76" r="4" fill="#0a1828"/>
+        <!-- pipe / duct centre-left -->
+        <rect x="140" y="0" width="14" height="100" fill="#0d1e30"/>
+        <rect x="136" y="20" width="22" height="8" rx="2" fill="#0f2235"/>
+        <rect x="136" y="50" width="22" height="8" rx="2" fill="#0f2235"/>
+        <rect x="136" y="80" width="22" height="8" rx="2" fill="#0f2235"/>
+        <!-- worker silhouette left -->
+        <ellipse cx="195" cy="32" rx="9" ry="9" fill="#0d1e30"/>
+        <rect x="188" y="40" width="14" height="30" rx="3" fill="#0d1e30"/>
+        <rect x="182" y="42" width="8" height="20" rx="3" fill="#0d1e30"/>
+        <rect x="200" y="42" width="8" height="20" rx="3" fill="#0d1e30"/>
+        <rect x="190" y="68" width="6" height="22" rx="2" fill="#0d1e30"/>
+        <rect x="199" y="68" width="6" height="22" rx="2" fill="#0d1e30"/>
+        <!-- clipboard in hand -->
+        <rect x="208" y="46" width="10" height="13" rx="1" fill="#0a1828"/>
+        <!-- large machinery centre -->
+        <rect x="260" y="10" width="80" height="90" rx="4" fill="#091520"/>
+        <rect x="266" y="18" width="28" height="20" rx="2" fill="#0a1828"/>
+        <rect x="300" y="18" width="28" height="20" rx="2" fill="#0a1828"/>
+        <rect x="266" y="44" width="62" height="6" rx="1" fill="#0a1828"/>
+        <rect x="266" y="56" width="62" height="6" rx="1" fill="#0a1828"/>
+        <rect x="266" y="68" width="62" height="6" rx="1" fill="#0a1828"/>
+        <rect x="278" y="80" width="10" height="20" fill="#0a1828"/>
+        <rect x="312" y="80" width="10" height="20" fill="#0a1828"/>
+        <!-- conveyor support pillar -->
+        <rect x="370" y="60" width="12" height="60" fill="#0d1e30"/>
+        <rect x="362" y="56" width="28" height="8" rx="2" fill="#0f2235"/>
+        <!-- worker silhouette right -->
+        <ellipse cx="430" cy="28" rx="9" ry="9" fill="#0d1e30"/>
+        <rect x="423" y="36" width="14" height="30" rx="3" fill="#0d1e30"/>
+        <rect x="415" y="40" width="10" height="18" rx="3" fill="#0d1e30"/>
+        <rect x="437" y="36" width="8" height="22" rx="3" fill="#0d1e30"/>
+        <rect x="425" y="64" width="6" height="22" rx="2" fill="#0d1e30"/>
+        <rect x="434" y="64" width="6" height="22" rx="2" fill="#0d1e30"/>
+        <!-- robotic arm right -->
+        <rect x="490" y="10" width="8" height="80" fill="#1a3a5a"/>
+        <rect x="478" y="6" width="32" height="10" rx="2" fill="#1a3a5a"/>
+        <rect x="494" y="0" width="6" height="18" fill="#1a3a5a"/>
+        <rect x="490" y="0" width="14" height="8" rx="2" fill="#1a3a5a"/>
+        <circle cx="497" cy="0" r="6" fill="#0d2a40"/>
+        <rect x="496" y="58" width="30" height="8" rx="2" fill="#1a3a5a"/>
+        <rect x="524" y="52" width="8" height="20" rx="2" fill="#1a3a5a"/>
+        <!-- machine panel right -->
+        <rect x="560" y="25" width="60" height="75" rx="3" fill="#0f2235"/>
+        <rect x="566" y="32" width="20" height="14" rx="1" fill="#0a1828"/>
+        <rect x="592" y="32" width="20" height="14" rx="1" fill="#0a1828"/>
+        <rect x="566" y="52" width="46" height="5" rx="1" fill="#0a1828"/>
+        <rect x="566" y="62" width="46" height="5" rx="1" fill="#0a1828"/>
+        <circle cx="578" cy="76" r="5" fill="#0a1828"/>
+        <circle cx="592" cy="76" r="5" fill="#0a1828"/>
+        <circle cx="606" cy="76" r="5" fill="#0a1828"/>
+        <!-- pipe right -->
+        <rect x="640" y="0" width="12" height="100" fill="#0d1e30"/>
+        <rect x="636" y="15" width="20" height="7" rx="2" fill="#0f2235"/>
+        <rect x="636" y="45" width="20" height="7" rx="2" fill="#0f2235"/>
+        <rect x="636" y="75" width="20" height="7" rx="2" fill="#0f2235"/>
+        <!-- warning light on pipe -->
+        <circle cx="646" cy="8" r="5" fill="#1a3a5a"/>
+        <!-- hanging lamp -->
+        <line x1="400" y1="0" x2="400" y2="18" stroke="#0d1e30" stroke-width="2"/>
+        <polygon points="388,18 412,18 406,36 394,36" fill="#0d1e30"/>
+        <!-- far right machinery -->
+        <rect x="700" y="20" width="90" height="80" rx="3" fill="#091520"/>
+        <rect x="708" y="28" width="30" height="22" rx="2" fill="#0a1828"/>
+        <rect x="744" y="28" width="30" height="22" rx="2" fill="#0a1828"/>
+        <rect x="708" y="56" width="66" height="5" rx="1" fill="#0a1828"/>
+        <rect x="708" y="66" width="66" height="5" rx="1" fill="#0a1828"/>
+        <rect x="708" y="76" width="66" height="5" rx="1" fill="#0a1828"/>
+        <!-- WARNING LIGHTS — animated, activated at higher levels -->
+        <circle id="wl1" cx="84"  cy="8"  r="5" fill="#1a3a5a"/>
+        <circle id="wl2" cx="300" cy="6"  r="5" fill="#1a3a5a"/>
+        <circle id="wl3" cx="500" cy="4"  r="6" fill="#1a3a5a"/>
+        <circle id="wl4" cx="646" cy="8"  r="5" fill="#1a3a5a"/>
+        <circle id="wl5" cx="750" cy="18" r="5" fill="#1a3a5a"/>
+        <!-- alarm light poles -->
+        <rect x="82"  y="0"  width="4" height="8"  fill="#0d1e30"/>
+        <rect x="298" y="0"  width="4" height="6"  fill="#0d1e30"/>
+        <rect x="497" y="0"  width="6" height="4"  fill="#0d1e30"/>
+        <rect x="644" y="0"  width="4" height="8"  fill="#0d1e30"/>
+        <rect x="748" y="12" width="4" height="6"  fill="#0d1e30"/>
+      </svg>
+    </div>
+    <div id="BELT_SECTION">
+      <div id="BELT_3D">
+        <div id="BELT_FRAME">
+          <div id="BELT_SURFACE"></div>
+          <div id="BELT_RIBS"></div>
+          <div id="BELT_GLOW_T"></div>
+          <div id="BELT_GLOW_B"></div>
+        </div>
+        <div class="ROLLER" id="ROLLER_L"></div>
+        <div class="ROLLER" id="ROLLER_R"></div>
+        <div id="SCANNER"></div>
+        <div id="SCAN_HEAD"></div>
+      </div>
+      <!-- QUEUE PREVIEW ZONE — ghost packages approaching -->
+      <div id="QUEUE_ZONE" style="position:absolute;top:0;right:-140px;width:140px;height:145px;overflow:visible;z-index:5;opacity:0.35;pointer-events:none"></div>
+      <div id="PKG_ZONE"></div>
+    </div>
+    <div id="PROG_WRAP">
+      <div id="PROG_TRACK"><div id="PROG_FILL"></div></div>
+      <div id="PROG_LABELS"><span id="PROG_TXT">0 / 100 pts</span><span id="COMBO_TXT"></span></div>
+    </div>
+    <div id="TOUCH_HINT"></div>
+    <div id="BINS_WRAP">
+      <div class="BIN_3D" id="bin_N"
+        ondragover="bov(event,'bin_N')"
+        ondragleave="blv('bin_N')"
+        ondrop="bdp(event,'N')">
+        <div class="BIN_BODY">
+          <div class="BIN_ICON">🏷</div>
+          <div class="BIN_NAME">NAME<br>DEFECT</div>
+          <div class="BIN_DESC">Wrong or missing<br>product name</div>
+          <div class="BIN_FILL" id="fill_N"></div>
+        </div>
+        <div class="BIN_SHADOW"></div>
+      </div>
+      <div class="BIN_3D" id="bin_B"
+        ondragover="bov(event,'bin_B')"
+        ondragleave="blv('bin_B')"
+        ondrop="bdp(event,'B')">
+        <div class="BIN_BODY">
+          <div class="BIN_ICON">📊</div>
+          <div class="BIN_NAME">BARCODE<br>DEFECT</div>
+          <div class="BIN_DESC">Missing or<br>unreadable barcode</div>
+          <div class="BIN_FILL" id="fill_B"></div>
+        </div>
+        <div class="BIN_SHADOW"></div>
+      </div>
+      <div class="BIN_3D" id="bin_P"
+        ondragover="bov(event,'bin_P')"
+        ondragleave="blv('bin_P')"
+        ondrop="bdp(event,'P')">
+        <div class="BIN_BODY">
+          <div class="BIN_ICON">📦</div>
+          <div class="BIN_NAME">PACKAGE<br>DEFECT</div>
+          <div class="BIN_DESC">Damaged or<br>opened packaging</div>
+          <div class="BIN_FILL" id="fill_P"></div>
+        </div>
+        <div class="BIN_SHADOW"></div>
+      </div>
+    </div>
+    <div id="ANNOUNCE" class="H">
+      <div class="ANN_INNER">
+        <div class="ANN_SHIFT" id="ANN_SHIFT">SHIFT 1</div>
+        <div class="ANN_TITLE" id="ANN_TITLE">WARM UP</div>
+        <div class="ANN_SUB" id="ANN_SUB">Score 100 pts to advance</div>
+      </div>
+    </div>
+    <!-- PAUSE OVERLAY -->
+    <div id="PAUSE_OVL" class="H" style="position:absolute;inset:0;background:rgba(2,5,12,0.92);flex-direction:column;align-items:center;justify-content:center;z-index:55">
+      <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:#00b8ff;margin-bottom:12px;letter-spacing:4px">PAUSED</div>
+      <div style="font-size:12px;color:#3a5a80;letter-spacing:2px;margin-bottom:28px">SHIFT IS ON HOLD</div>
+      <button onclick="togglePause()" style="background:transparent;border:2px solid #00b8ff;color:#00b8ff;font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;padding:12px 28px;cursor:pointer;border-radius:4px">RESUME &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4: END ═══ -->
+<div id="OVS" class="SCR H">
+<div class="END_WRAP">
+  <div class="END_BADGE" id="end_badge">SHIFT REPORT</div>
+  <div class="END_TITLE" id="end_title">SHIFT OVER</div>
+  <div class="END_LINE"></div>
+  <div class="END_SCORE" id="end_score">0</div>
+  <div class="END_SCORE_L">TOTAL SCORE</div>
+  <div class="END_GRADE" id="end_grade">D</div>
+  <div class="END_STATS" id="end_stats"></div>
+  <div class="BTN_GROUP" style="justify-content:center">
+    <button class="BTN_SEC" onclick="show('INTRO')">MAIN MENU</button>
+    <button class="BTN_SEC" onclick="show('CREDITS')">CREDITS</button>
+    <button class="BTN_PRI" onclick="startGame()">NEW SHIFT</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ SCREEN 5: CREDITS ═══ -->
+<div id="CREDITS" class="SCR H" style="background:linear-gradient(160deg,#020810 0%,#040d1a 60%,#020508 100%)">
+<div class="SWRAP" style="max-width:580px;margin:auto">
+
+  <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:4px;color:#f97316;border:1px solid rgba(249,115,22,0.3);display:inline-block;padding:4px 12px;border-radius:2px;background:rgba(249,115,22,0.06);margin-bottom:22px">CREDITS &amp; INFO</div>
+
+  <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:#fff;margin-bottom:4px;letter-spacing:2px">FACTORY PANIC</div>
+  <div style="font-size:10px;letter-spacing:3px;color:#3a5a80;margin-bottom:28px">QUALITY CONTROL SIMULATOR</div>
+
+  <!-- divider -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(249,115,22,0.4))"></div>
+    <div style="font-family:'Orbitron',monospace;font-size:8px;color:#f97316;letter-spacing:2px">MADE BY</div>
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(249,115,22,0.4),transparent)"></div>
+  </div>
+
+  <div style="font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:#00b8ff;margin-bottom:4px;text-shadow:0 0 20px rgba(0,180,255,0.4)">TOLU</div>
+  <div style="font-size:11px;color:#3a5a80;letter-spacing:2px;margin-bottom:6px">@TOLUSZN ON X &nbsp;&bull;&nbsp; X.COM/TOLUSZN</div>
+  <div style="font-size:11px;color:#5a7a9a;line-height:1.9;margin-bottom:32px;max-width:460px">
+    Solo Developer &mdash; Game Design, Code &amp; Visual Art.<br>
+    Conceived the quality control mechanic, built the entire game from scratch in raw HTML5, CSS3 and JavaScript with no engine, designed all 8 product packages as hand-coded SVG illustrations, and engineered the factory sound system using the Web Audio API.
+  </div>
+
+  <!-- jam info -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid #1a2a4a;border-radius:10px;padding:18px 20px;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px">
+      <div style="color:#3a5a80;letter-spacing:1px">JAM</div>
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:#c8d8f0">GAMEDEV.JS JAM 2026</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px">
+      <div style="color:#3a5a80;letter-spacing:1px">THEME</div>
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:#a855f7">MACHINES</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px">
+      <div style="color:#3a5a80;letter-spacing:1px">BUILT WITH</div>
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:#c8d8f0">HTML5 &nbsp;CSS3 &nbsp;JS &nbsp;WEB AUDIO</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:11px">
+      <div style="color:#3a5a80;letter-spacing:1px">VERSION</div>
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:#00b8ff">1.0.0</div>
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid #1a2a4a;border-radius:10px;padding:18px 20px;margin-bottom:20px">
+    <div style="font-family:'Orbitron',monospace;font-size:9px;color:#00b8ff;letter-spacing:3px;margin-bottom:14px">HOW TO PLAY</div>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px">
+      <div style="color:#3a5a80">PC</div><div style="color:#c8d8f0">Drag defective packages to the correct bin</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px">
+      <div style="color:#3a5a80">MOBILE</div><div style="color:#c8d8f0">Touch and drag packages to bins</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:11px">
+      <div style="color:#3a5a80">CLEAN PKG</div><div style="color:#4ade80">Let it pass — earn +5 pts</div>
+    </div>
+  </div>
+
+  <!-- theme note -->
+  <div style="background:rgba(168,85,247,0.05);border:1px solid rgba(168,85,247,0.2);border-radius:10px;padding:16px 20px;margin-bottom:28px;font-size:11px;color:#7a6a9a;line-height:1.9">
+    <div style="font-family:'Orbitron',monospace;font-size:9px;color:#a855f7;letter-spacing:3px;margin-bottom:10px">THEME INTERPRETATION</div>
+    Factory Panic interprets <b style="color:#c8d8f0">MACHINES</b> through the industrial setting — a fully automated distribution facility where machines produce, package, and transport goods along conveyor belts. You are the human quality inspector working alongside the machines, catching what they miss.
+  </div>
+
+  <div style="text-align:center;font-size:9px;color:#1e3a5a;letter-spacing:2px;margin-bottom:24px">
+    &copy; 2026 TOLU &nbsp;&bull;&nbsp; GAMEDEV.JS JAM 2026 &nbsp;&bull;&nbsp; @TOLUSZN
+  </div>
+
+  <div style="display:flex;gap:12px;justify-content:center">
+    <button class="BTN_SEC" onclick="show('INTRO')" style="border-color:#1a2a4a;color:#3a5a80">&larr; MAIN MENU</button>
+    <button class="BTN_PRI" onclick="startGame()">PLAY NOW &rarr;</button>
+  </div>
+</div>
+</div>
+<script>
+/* ─── PRODUCT DEFINITIONS ─────────────────────────── */
+/* Each product: name, brand colour, accent colour, SVG artwork for the front panel */
+const PRODUCTS=[
+  {
+    name:'ZEXON',
+    bg:'#0d1f4a',band:'#1a3a8a',accent:'#4a90ff',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <rect x="5" y="8" width="60" height="36" rx="18" fill="#1a3a8a" opacity=".5"/>
+      <ellipse cx="35" cy="26" rx="20" ry="20" fill="#0a2060"/>
+      <ellipse cx="35" cy="26" rx="14" ry="14" fill="#1a3a8a"/>
+      <ellipse cx="35" cy="26" rx="8" ry="8" fill="#2a5adc"/>
+      <ellipse cx="35" cy="26" rx="3" ry="3" fill="#7ab4ff"/>
+      <line x1="35" y1="6" x2="35" y2="12" stroke="#4a90ff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="35" y1="40" x2="35" y2="46" stroke="#4a90ff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="15" y1="26" x2="21" y2="26" stroke="#4a90ff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="49" y1="26" x2="55" y2="26" stroke="#4a90ff" stroke-width="2" stroke-linecap="round"/>
+      <text x="35" y="50" text-anchor="middle" fill="#4a90ff" font-size="6" font-family="monospace" letter-spacing="2">OPTICAL</text>
+    </svg>`
+  },
+  {
+    name:'BLIMCO',
+    bg:'#2a0a0a',band:'#7a0a0a',accent:'#ff3a3a',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <rect x="10" y="4" width="50" height="44" rx="4" fill="#5a0808" opacity=".6"/>
+      <rect x="14" y="8" width="42" height="36" rx="3" fill="#3a0404"/>
+      <path d="M35 12 L44 28 L26 28 Z" fill="#ff3a3a"/>
+      <path d="M35 34 L44 22 L26 22 Z" fill="#ff8a3a" opacity=".7"/>
+      <rect x="28" y="36" width="14" height="3" rx="1.5" fill="#ff3a3a" opacity=".6"/>
+      <text x="35" y="50" text-anchor="middle" fill="#ff6060" font-size="7" font-family="monospace" font-weight="bold">BLIMCO</text>
+    </svg>`
+  },
+  {
+    name:'QUANTA',
+    bg:'#041a10',band:'#084a22',accent:'#00e87a',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <rect x="8" y="6" width="54" height="40" rx="6" fill="#062a14" opacity=".7"/>
+      <polygon points="35,8 55,20 55,34 35,46 15,34 15,20" fill="none" stroke="#00e87a" stroke-width="1.5" opacity=".8"/>
+      <polygon points="35,16 47,23 47,33 35,40 23,33 23,23" fill="none" stroke="#00e87a" stroke-width="1" opacity=".5"/>
+      <circle cx="35" cy="27" r="5" fill="#00e87a" opacity=".9"/>
+      <circle cx="35" cy="27" r="2.5" fill="#c0fff0"/>
+      <line x1="35" y1="8" x2="35" y2="16" stroke="#00e87a" stroke-width="1" opacity=".5"/>
+      <line x1="55" y1="20" x2="47" y2="23" stroke="#00e87a" stroke-width="1" opacity=".5"/>
+      <line x1="55" y1="34" x2="47" y2="33" stroke="#00e87a" stroke-width="1" opacity=".5"/>
+      <text x="35" y="51" text-anchor="middle" fill="#00e87a" font-size="6" font-family="monospace" letter-spacing="1">QUANTA</text>
+    </svg>`
+  },
+  {
+    name:'GLOPPO',
+    bg:'#1a0d2e',band:'#3a1a6a',accent:'#c060ff',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <ellipse cx="35" cy="26" rx="26" ry="22" fill="#2a0d4a" opacity=".8"/>
+      <ellipse cx="35" cy="26" rx="18" ry="15" fill="#3a1060"/>
+      <path d="M26 18 Q35 10 44 18 Q50 26 44 34 Q35 42 26 34 Q20 26 26 18Z" fill="none" stroke="#c060ff" stroke-width="1.5" opacity=".7"/>
+      <circle cx="35" cy="26" r="6" fill="#6020a0"/>
+      <circle cx="35" cy="26" r="3" fill="#c060ff" opacity=".9"/>
+      <circle cx="29" cy="20" r="2" fill="#c060ff" opacity=".4"/>
+      <circle cx="43" cy="20" r="1.5" fill="#c060ff" opacity=".3"/>
+      <circle cx="29" cy="32" r="1.5" fill="#c060ff" opacity=".3"/>
+      <circle cx="43" cy="32" r="2" fill="#c060ff" opacity=".4"/>
+      <text x="35" y="51" text-anchor="middle" fill="#c060ff" font-size="6" font-family="monospace" letter-spacing="1">GLOPPO</text>
+    </svg>`
+  },
+  {
+    name:'FROBIX',
+    bg:'#1a1000',band:'#4a2c00',accent:'#ffaa00',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <rect x="12" y="8" width="46" height="36" rx="4" fill="#3a2000" opacity=".8"/>
+      <rect x="16" y="12" width="38" height="28" rx="2" fill="#2a1400"/>
+      <path d="M18 38 L28 14 L35 28 L42 14 L52 38Z" fill="#ffaa00" opacity=".2"/>
+      <path d="M22 38 L30 18 L35 30 L40 18 L48 38" fill="none" stroke="#ffaa00" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="35" cy="24" r="5" fill="#ffaa00" opacity=".9"/>
+      <circle cx="35" cy="24" r="2.5" fill="#fff8e0"/>
+      <text x="35" y="51" text-anchor="middle" fill="#ffaa00" font-size="6" font-family="monospace" letter-spacing="1">FROBIX</text>
+    </svg>`
+  },
+  {
+    name:'NEXOIL',
+    bg:'#001a1a',band:'#004444',accent:'#00d4d4',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <rect x="8" y="6" width="54" height="40" rx="3" fill="#002a2a" opacity=".7"/>
+      <rect x="29" y="4" width="12" height="8" rx="2" fill="#003a3a"/>
+      <rect x="22" y="10" width="26" height="32" rx="4" fill="#004040"/>
+      <ellipse cx="35" cy="26" rx="10" ry="14" fill="#006060" opacity=".8"/>
+      <ellipse cx="35" cy="26" rx="6" ry="10" fill="#009090"/>
+      <ellipse cx="35" cy="24" rx="3" ry="4" fill="#00d4d4" opacity=".8"/>
+      <rect x="22" y="40" width="26" height="4" rx="2" fill="#003a3a"/>
+      <text x="35" y="51" text-anchor="middle" fill="#00d4d4" font-size="6" font-family="monospace" letter-spacing="1">NEXOIL</text>
+    </svg>`
+  },
+  {
+    name:'CRISPY',
+    bg:'#1a0f00',band:'#5a3000',accent:'#ff8c00',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <rect x="8" y="5" width="54" height="42" rx="5" fill="#3a1800" opacity=".8"/>
+      <path d="M14 38 Q35 6 56 38Z" fill="#ff8c00" opacity=".25"/>
+      <path d="M18 38 Q35 10 52 38Z" fill="none" stroke="#ff8c00" stroke-width="1.5" opacity=".7"/>
+      <path d="M22 38 Q35 14 48 38Z" fill="none" stroke="#ffb84d" stroke-width="1" opacity=".5"/>
+      <circle cx="35" cy="22" r="7" fill="#ff8c00" opacity=".9"/>
+      <circle cx="35" cy="22" r="4" fill="#ffe0a0"/>
+      <path d="M32 20 Q35 17 38 20 Q41 24 38 27 Q35 30 32 27 Q29 24 32 20Z" fill="#ff8c00"/>
+      <text x="35" y="51" text-anchor="middle" fill="#ff8c00" font-size="6" font-family="monospace" letter-spacing="1">CRISPY</text>
+    </svg>`
+  },
+  {
+    name:'LUMINO',
+    bg:'#00001a',band:'#00006a',accent:'#a0b0ff',text:'#ffffff',
+    art:`<svg viewBox="0 0 70 52" width="70" height="52">
+      <rect x="8" y="6" width="54" height="40" rx="6" fill="#00004a" opacity=".8"/>
+      <circle cx="35" cy="25" r="16" fill="none" stroke="#a0b0ff" stroke-width="1" opacity=".3"/>
+      <circle cx="35" cy="25" r="11" fill="none" stroke="#a0b0ff" stroke-width="1.5" opacity=".5"/>
+      <circle cx="35" cy="25" r="6" fill="#2030a0" opacity=".9"/>
+      <circle cx="35" cy="25" r="3" fill="#c0d0ff"/>
+      <line x1="35" y1="9" x2="35" y2="14" stroke="#a0b0ff" stroke-width="1.5" opacity=".7"/>
+      <line x1="35" y1="36" x2="35" y2="41" stroke="#a0b0ff" stroke-width="1.5" opacity=".7"/>
+      <line x1="19" y1="25" x2="24" y2="25" stroke="#a0b0ff" stroke-width="1.5" opacity=".7"/>
+      <line x1="46" y1="25" x2="51" y2="25" stroke="#a0b0ff" stroke-width="1.5" opacity=".7"/>
+      <line x1="22" y1="14" x2="26" y2="18" stroke="#a0b0ff" stroke-width="1" opacity=".5"/>
+      <line x1="44" y1="32" x2="48" y2="36" stroke="#a0b0ff" stroke-width="1" opacity=".5"/>
+      <text x="35" y="51" text-anchor="middle" fill="#a0b0ff" font-size="6" font-family="monospace" letter-spacing="1">LUMINO</text>
+    </svg>`
+  }
+];
+const LVS=[
+  {time:60, spd:3.0, rate:4500, tgt:50,   lbl:'WARM UP',       suf:'SHIFT 1',  sub:'Score 50 pts to advance'},
+  {time:65, spd:3.8, rate:4000, tgt:150,  lbl:'PICKING UP',    suf:'SHIFT 2',  sub:'Score 150 pts to advance'},
+  {time:70, spd:4.8, rate:3400, tgt:250,  lbl:'HEATING UP',    suf:'SHIFT 3',  sub:'Score 250 pts to advance'},
+  {time:75, spd:5.8, rate:2900, tgt:380,  lbl:'UNDER FIRE',    suf:'SHIFT 4',  sub:'Score 380 pts to advance'},
+  {time:80, spd:7.0, rate:2400, tgt:520,  lbl:'FULL SPEED',    suf:'SHIFT 5',  sub:'Score 520 pts to advance'},
+  {time:85, spd:8.2, rate:2000, tgt:700,  lbl:'OVERLOADED',    suf:'SHIFT 6',  sub:'Score 700 pts to advance'},
+  {time:90, spd:9.5, rate:1700, tgt:920,  lbl:'CRITICAL ZONE', suf:'SHIFT 7',  sub:'Score 920 pts to advance'},
+  {time:95, spd:11.0,rate:1400, tgt:1180, lbl:'MACHINE CHAOS', suf:'SHIFT 8',  sub:'Score 1180 pts to advance'},
+  {time:100,spd:12.5,rate:1200, tgt:1480, lbl:'MELTDOWN',      suf:'SHIFT 9',  sub:'Score 1480 pts to advance'},
+  {time:110,spd:14.0,rate:1000, tgt:1900, lbl:'TOTAL PANIC',   suf:'SHIFT 10', sub:'Score 1900 pts to win!'}
+];
+
+/* ─── STATE ─────────────────────────────── */
+let gs={},pkgs=[],dg=null,combo=0,crt=0,msd=0,clp=0;
+let spT=null,coT=null,rf=null,lc=null,run=false;
+let paused=false,muted=false;
+let binFill={N:0,B:0,P:0};
+let queuePkgs=[];
+const $=i=>document.getElementById(i);
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+
+/* ─── PAUSE ──────────────────────────────── */
+function togglePause(){
+  if(!run&&!paused)return;
+  paused=!paused;
+  $('btn_pause').textContent=paused?'▶':'⏸';
+  $('PAUSE_OVL').classList.toggle('H',!paused);
+  if(paused){
+    stopBeltAmbience();
+  } else {
+    startBeltAmbience();
+  }
+}
+
+/* ─── MUTE ───────────────────────────────── */
+function toggleMute(){
+  muted=!muted;
+  $('btn_mute').textContent=muted?'🔇':'🔊';
+}
+
+/* ─── FULLSCREEN ─────────────────────────── */
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    ($('G').requestFullscreen||$('G').webkitRequestFullscreen||$('G').mozRequestFullScreen).call($('G'));
+  } else {
+    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document);
+  }
+}
+
+/* ─── BIN FILL ───────────────────────────── */
+function animateBinFill(type){
+  const el=$('fill_'+type);
+  if(!el)return;
+  /* flash up fast then drain */
+  el.style.transition='height 0.15s ease,opacity 0.15s ease';
+  el.style.height='55%';
+  el.style.opacity='1';
+  setTimeout(()=>{
+    el.style.transition='height 0.6s ease,opacity 0.6s ease';
+    el.style.height='0%';
+    el.style.opacity='0';
+  },300);
+}
+
+/* ─── QUEUE PREVIEW ──────────────────────── */
+function addToQueue(prod,def){
+  const zone=$('QUEUE_ZONE');
+  if(!zone)return;
+  const ghost=document.createElement('div');
+  ghost.style.cssText='position:absolute;top:50%;transform:translateY(-50%);width:96px;height:120px;right:10px;';
+  ghost.innerHTML=buildPackageSVG(prod,def);
+  zone.innerHTML='';
+  zone.appendChild(ghost);
+  queuePkgs=[{prod,def}];
+}
+function clearQueue(){
+  const zone=$('QUEUE_ZONE');
+  if(zone) zone.innerHTML='';
+  queuePkgs=[];
+}
+
+/* ─── FACTORY MOOD (visual level escalation) ── */
+function updateFactoryMood(lvl){
+  const bg=$('FACTORY_BG');
+  if(!bg)return;
+  const lights=['wl1','wl2','wl3','wl4','wl5'];
+  /* how many lights are active based on level */
+  const activeCount=Math.floor((lvl/10)*5);
+  const isPanic=lvl>=8;
+  lights.forEach((id,i)=>{
+    const el=$(id);
+    if(!el)return;
+    if(i<activeCount){
+      el.setAttribute('fill', isPanic?'#ff2020':'#ff6600');
+      el.setAttribute('class', isPanic?'wl-panic':'wl-active');
+    } else {
+      el.setAttribute('fill','#1a3a5a');
+      el.setAttribute('class','');
+    }
+  });
+  /* tint the whole background redder at higher levels */
+  const intensity=Math.min((lvl-1)/9,1);
+  const r=Math.round(intensity*180);
+  bg.style.filter=lvl>=5?`sepia(0.3) hue-rotate(-${r*0.4}deg) saturate(${1+intensity})`:
+                  lvl>=3?'sepia(0.1)':'none';
+}
+
+/* ─── PARTICLES ─────────────────────────── */
+function spawnParticles(){
+  const c=$('PARTICLES');
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    p.className='PART';
+    const sz=Math.random()*3+1;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:0;background:rgba(0,180,255,${Math.random()*0.3+0.1});animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*8}s`;
+    c.appendChild(p);
+  }
+}
+spawnParticles();
+
+/* ─── SCREENS ───────────────────────────── */
+function show(id){
+  ['INTRO','TSCREEN','GMS','OVS','CREDITS'].forEach(s=>$(s).classList.toggle('H',s!==id));
+}
+
+/* ─── GAME ──────────────────────────────── */
+function startGame(){
+  pkgs=[];dg=null;combo=0;crt=0;msd=0;clp=0;run=false;
+  gs={lvl:0,sc:0,time:0};
+  show('GMS');
+  loadLevel(0);
+}
+
+function loadLevel(i){
+  stop();
+  pkgs.forEach(p=>p.dead=true);
+  document.querySelectorAll('.PKG').forEach(e=>e.remove());
+  pkgs=[];dg=null;combo=0;
+  $('ht_v').classList.remove('TIME_WARN');
+  paused=false;$('PAUSE_OVL').classList.add('H');$('btn_pause').textContent='⏸';
+  lc=LVS[i];gs.lvl=i+1;gs.time=lc.time;
+  binFill={N:0,B:0,P:0};
+  clearQueue();
+  updateFactoryMood(gs.lvl);
+  /* roller spin speed matches belt */
+  [$('ROLLER_L'),$('ROLLER_R')].forEach(r=>{
+    if(!r)return;
+    r.classList.toggle('roller-vfast',lc.spd>=11);
+    r.classList.toggle('roller-fast',lc.spd>=7&&lc.spd<11);
+  });
+  updH();updBar();
+  showAnnounce(lc.suf,lc.lbl,lc.sub,()=>{
+    run=true;
+    startBeltAmbience();
+    const mobileRate=window.innerWidth<600?Math.round(lc.rate*1.6):lc.rate;
+    spT=setInterval(spawn,mobileRate);
+    spawn();
+    coT=setInterval(tick,1000);
+    loop();
+  });
+}
+
+function stop(){
+  run=false;
+  stopBeltAmbience();
+  clearInterval(spT);clearInterval(coT);cancelAnimationFrame(rf);
+  spT=coT=rf=null;
+}
+
+function tick(){
+  if(paused)return;
+  gs.time--;updH();
+  if(gs.time<=10){
+    $('ht_v').classList.add('TIME_WARN');
+    if(!muted) SFX.tick();
+  }
+  if(gs.time>0)return;
+  $('ht_v').classList.remove('TIME_WARN');
+  stop();
+  gs.sc>=lc.tgt
+    ?(gs.lvl<LVS.length?(!muted&&SFX.levelUp(),loadLevel(gs.lvl)):endGame(true))
+    :endGame(false);
+}
+
+function loop(){
+  if(!run){rf=requestAnimationFrame(loop);return;}
+  if(paused){rf=requestAnimationFrame(loop);return;}
+  pkgs.forEach(p=>{
+    if(p.dead||p.sc)return;
+    const el=$(p.id);if(!el)return;
+    p.x-=p.spd;
+    el.style.left=p.x+'px';
+    if(p.x<-120){
+      p.sc=true;
+      if(p.def===null){
+        clp++;combo++;
+        const bon=combo>=3?5:0;
+        if(bon>0){if(!muted)SFX.combo();}else{if(!muted)SFX.pass();}
+        pts(5+bon,bon?'+'+(5+bon)+' COMBO!':'+5',el,true);
+        updC();
+      } else {
+        msd++;combo=0;updC();
+        if(!muted) SFX.missed();
+        pts(-5,'−5 MISSED!',el,false);
+      }
+      setTimeout(()=>{el.remove();pkgs=pkgs.filter(q=>q.id!==p.id);},20);
+    }
+  });
+  rf=requestAnimationFrame(loop);
+}
+
+/* ─── PACKAGE SVG BUILDER ────────────────────────── */
+function buildBarcode(missing){
+  if(missing){
+    return `<svg viewBox="0 0 72 18" width="72" height="18">
+      <rect width="72" height="18" rx="2" fill="rgba(249,115,22,0.12)" stroke="#f97316" stroke-width="1.2" stroke-dasharray="3,2"/>
+      <line x1="8" y1="4" x2="64" y2="14" stroke="#f97316" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="64" y1="4" x2="8" y2="14" stroke="#f97316" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>`;
+  }
+  const bars=Array.from({length:22},(_,i)=>{
+    const w=i%3===0?2:1;
+    const h=6+Math.floor(Math.random()*8);
+    const x=2+i*3;
+    return `<rect x="${x}" y="${16-h}" width="${w}" height="${h}" fill="#111"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 72 18" width="72" height="18">
+    <rect width="72" height="18" rx="2" fill="white"/>
+    ${bars}
+    <rect x="2" y="14" width="68" height="2" fill="none"/>
+  </svg>`;
+}
+
+function buildPackageSVG(prod, def){
+  const name = def==='N' ? '???' : prod.name;
+  const isDamaged = def==='P';
+  const glowCol = def===null?'rgba(255,255,255,0.1)':def==='N'?'rgba(251,191,36,0.7)':def==='B'?'rgba(249,115,22,0.7)':'rgba(239,68,68,0.7)';
+
+  if(isDamaged){
+    /* ── DAMAGED BOX: physically deformed shape ── */
+    /* The top-left corner is crushed inward, top flap is bent open,
+       right side is dented, bottom-left is buckled */
+    return `<svg viewBox="0 0 96 120" width="96" height="120" style="display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.8)) drop-shadow(0 0 8px rgba(239,68,68,0.6))">
+      <defs>
+        <linearGradient id="dmg_bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${prod.band}"/>
+          <stop offset="100%" stop-color="${prod.bg}"/>
+        </linearGradient>
+        <linearGradient id="dmg_side" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="${prod.bg}"/>
+          <stop offset="100%" stop-color="rgba(0,0,0,0.7)"/>
+        </linearGradient>
+        <linearGradient id="dmg_inner" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1a0a08"/>
+          <stop offset="100%" stop-color="#0a0504"/>
+        </linearGradient>
+      </defs>
+
+      <!-- DEFORMED MAIN FACE — polygon instead of rect, corners crushed -->
+      <!-- top-left crushed in by ~8px, top-right flap torn up, bottom-left buckled -->
+      <polygon points="
+        10,8
+        52,2
+        84,5
+        87,108
+        6,112
+        2,88
+        4,44
+        8,20
+      " fill="url(#dmg_bg)"/>
+
+      <!-- RIGHT SIDE FACE — also skewed from impact -->
+      <polygon points="84,5 92,10 91,112 87,108" fill="url(#dmg_side)"/>
+
+      <!-- TORN OPEN FLAP at top — the lid is peeling back -->
+      <polygon points="34,2 52,2 68,-4 72,8 52,10 30,8" fill="${prod.band}" opacity=".85"/>
+      <!-- shadow under flap -->
+      <polygon points="34,8 52,10 68,4 68,8 52,14 34,12" fill="rgba(0,0,0,0.4)"/>
+      <!-- exposed interior darkness -->
+      <polygon points="34,8 52,10 68,8 68,12 52,16 34,13" fill="url(#dmg_inner)"/>
+
+      <!-- CRUSHED DENT on right side — inward polygon depression -->
+      <polygon points="84,52 92,48 92,72 84,68 88,62 88,58" fill="rgba(0,0,0,0.5)"/>
+      <!-- crease line from dent -->
+      <line x1="84" y1="52" x2="72" y2="60" stroke="rgba(0,0,0,0.6)" stroke-width="2"/>
+      <line x1="84" y1="68" x2="72" y2="60" stroke="rgba(0,0,0,0.5)" stroke-width="1.5"/>
+
+      <!-- BUCKLED BOTTOM LEFT CORNER -->
+      <polygon points="2,88 12,92 10,112 6,112" fill="${prod.bg}" opacity=".6"/>
+      <line x1="2" y1="88" x2="12" y2="92" stroke="rgba(0,0,0,0.5)" stroke-width="2"/>
+
+      <!-- TOP BAND with name — follows deformed shape -->
+      <polygon points="10,8 84,5 87,26 8,28" fill="${prod.band}"/>
+      <text x="46" y="22" text-anchor="middle" fill="${prod.text}" font-size="10"
+        font-family="'Orbitron',monospace" font-weight="700" letter-spacing="1">${name}</text>
+
+      <!-- BRAND STRIPE -->
+      <polygon points="8,28 87,26 87,30 8,32" fill="${prod.accent}" opacity=".5"/>
+
+      <!-- PRODUCT ART — slightly skewed to match deformation -->
+      <g transform="translate(12,34) skewY(1)">${prod.art}</g>
+
+      <!-- BOTTOM BAND -->
+      <polygon points="6,88 87,86 87,108 6,112" fill="${prod.bg}" opacity=".88"/>
+      <g transform="translate(12,90)">${buildBarcode(false)}</g>
+      <text x="46" y="113" text-anchor="middle" fill="${prod.accent}"
+        font-size="5.5" font-family="monospace" opacity=".5" letter-spacing="1">${prod.name} &bull; NXC-7</text>
+
+      <!-- BORDER following deformed shape -->
+      <polygon points="10,8 52,2 84,5 87,108 6,112 2,88 4,44 8,20"
+        fill="none" stroke="#ef4444" stroke-width="1.2" opacity=".6"/>
+
+      <!-- CREASE LINES — physical fold marks on the cardboard -->
+      <line x1="10" y1="8" x2="24" y2="50" stroke="rgba(0,0,0,0.45)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="24" y1="50" x2="14" y2="90" stroke="rgba(0,0,0,0.35)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="52" y1="2" x2="58" y2="60" stroke="rgba(0,0,0,0.25)" stroke-width="1" stroke-linecap="round"/>
+
+      <!-- TOP HIGHLIGHT (uneven because of deformation) -->
+      <line x1="14" y1="9" x2="78" y2="6" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-linecap="round"/>
+
+      <!-- BOTTOM 3D EDGE -->
+      <polygon points="6,112 87,108 92,114 10,118" fill="${prod.bg}" opacity=".35"/>
+    </svg>`;
+  }
+
+  /* ── NORMAL (clean or name/barcode defect) BOX ── */
+  return `<svg viewBox="0 0 92 116" width="92" height="116" style="display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.7)) drop-shadow(0 0 6px ${glowCol})">
+    <defs>
+      <linearGradient id="bg_${prod.name}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${prod.band}"/>
+        <stop offset="100%" stop-color="${prod.bg}"/>
+      </linearGradient>
+      <linearGradient id="shine_${prod.name}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
+        <stop offset="50%" stop-color="rgba(255,255,255,0.04)"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+      </linearGradient>
+      <linearGradient id="side_${prod.name}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="${prod.bg}"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0.6)"/>
+      </linearGradient>
+    </defs>
+    <polygon points="86,6 92,12 92,110 86,104" fill="url(#side_${prod.name})"/>
+    <rect x="2" y="2" width="84" height="108" rx="6" fill="url(#bg_${prod.name})"/>
+    <rect x="2" y="2" width="84" height="108" rx="6" fill="url(#shine_${prod.name})"/>
+    <rect x="2" y="2" width="84" height="22" rx="6" fill="${prod.band}"/>
+    <rect x="2" y="16" width="84" height="8" fill="${prod.band}"/>
+    <text x="44" y="17" text-anchor="middle" fill="${prod.text}" font-size="10"
+      font-family="'Orbitron',monospace" font-weight="700" letter-spacing="1">${name}</text>
+    <rect x="2" y="24" width="84" height="3" fill="${prod.accent}" opacity=".6"/>
+    <g transform="translate(11,28)">${prod.art}</g>
+    <rect x="2" y="86" width="84" height="3" fill="${prod.accent}" opacity=".4"/>
+    <rect x="2" y="88" width="84" height="22" rx="0" fill="${prod.bg}" opacity=".9"/>
+    <rect x="2" y="103" width="84" height="7" rx="6" fill="${prod.bg}"/>
+    <g transform="translate(10,89)">${buildBarcode(def==='B')}</g>
+    <text x="44" y="112" text-anchor="middle" fill="${prod.accent}"
+      font-size="5.5" font-family="monospace" opacity=".6" letter-spacing="1">${def==='B'?'':prod.name} &bull; NXC-7</text>
+    <rect x="2" y="2" width="84" height="108" rx="6" fill="none" stroke="${prod.accent}" stroke-width="1" opacity=".35"/>
+    <line x1="8" y1="2.5" x2="80" y2="2.5" stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-linecap="round"/>
+    <polygon points="2,110 86,110 92,116 8,116" fill="${prod.bg}" opacity=".4"/>
+  </svg>`;
+}
+
+/* ─── SPAWN ─────────────────────────────── */
+function spawn(){
+  if(!run)return;
+  const zone=$('PKG_ZONE');if(!zone)return;
+  const prod=rnd(PRODUCTS);
+  const pool=[null,null,null,null,null,'N','N','B','B','P','P'];
+  const def=rnd(pool);
+  const id='k'+Date.now()+Math.random().toString(36).slice(2,5);
+  const sx=zone.offsetWidth+16;
+  const p={id,def,x:sx,spd:lc.spd,sc:false,dead:false};
+  pkgs.push(p);
+
+  const el=document.createElement('div');
+  el.className='PKG';el.id=id;el.draggable=true;
+  const isMobile=window.innerWidth<600;
+  el.style.cssText=`left:${sx}px;width:${isMobile?72:96}px;height:${isMobile?90:120}px`;
+  el.innerHTML=buildPackageSVG(prod,def);
+
+  el.addEventListener('dragstart',e=>{
+    dg=p;el.classList.add('DRAG');
+    e.dataTransfer.setData('text/plain',id);
+    e.dataTransfer.effectAllowed='move';
+    if(!muted) SFX.pick();
+  });
+  el.addEventListener('dragend',()=>el.classList.remove('DRAG'));
+  zone.appendChild(el);
+  /* entry slide-in animation */
+  el.classList.add('PKG_ENTERING');
+  setTimeout(()=>el.classList.remove('PKG_ENTERING'),300);
+  /* queue preview: pre-build next package ghost */
+  const nextProd=rnd(PRODUCTS);
+  const nextDef=rnd([null,null,null,null,null,'N','N','B','B','P','P']);
+  addToQueue(nextProd,nextDef);
+  if(!muted) SFX.spawn();
+}
+
+/* ─── BIN EVENTS ────────────────────────── */
+/* ─── TOUCH SUPPORT ─────────────────────────────
+   Full touch drag: touchstart to grab, touchmove to
+   drag visually, touchend over a bin to sort.
+   Works alongside PC drag-and-drop simultaneously.
+─────────────────────────────────────────────── */
+let selectedPkg=null;
+let touchDragEl=null, touchDragPkg=null;
+let touchOffX=0, touchOffY=0;
+
+function updTouchHint(state){
+  const h=$('TOUCH_HINT');
+  if(!h)return;
+  h.textContent=state==='selected'?'DRAG TO A BIN OR TAP A BIN':'';
+}
+
+function doSort(bdef){
+  const p=touchDragPkg||selectedPkg;
+  if(!p||p.sc||p.dead)return;
+  const el=$(p.id);
+  p.sc=true;
+  touchDragPkg=null; touchDragEl=null;
+  selectedPkg=null;
+  updTouchHint(null);
+  if(el){el.style.position='absolute';el.style.zIndex='6';el.style.opacity='1';}
+  if(p.def===null){
+    combo=0;updC();if(!muted)SFX.wrong();pts(-5,'−5 CLEAN PKG!',el,false);
+  } else if(p.def===bdef){
+    crt++;combo++;
+    const bon=combo>=3?5:0;
+    if(!muted){if(bon>0)SFX.combo();else SFX.correct();}
+    animateBinFill(bdef);
+    pts(5+bon,bon?'+'+(5+bon)+' COMBO!':'+5',el,true);
+    updC();
+  } else {
+    combo=0;updC();if(!muted)SFX.wrong();pts(-5,'−5 WRONG BIN',el,false);
+  }
+  if(el)setTimeout(()=>el.remove(),15);
+  pkgs=pkgs.filter(q=>q.id!==p.id);
+}
+
+function getBinAtPoint(x,y){
+  const bins=[['bin_N','N'],['bin_B','B'],['bin_P','P']];
+  for(const [id,def] of bins){
+    const el=$(id);
+    if(!el)continue;
+    const r=el.getBoundingClientRect();
+    if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return def;
+  }
+  return null;
+}
+
+/* wire all touch events after DOM loads */
+document.addEventListener('DOMContentLoaded',()=>{
+
+  /* ── TOUCH DRAG on packages ── */
+  document.addEventListener('touchstart',e=>{
+    const pkgEl=e.target.closest('.PKG');
+    if(!pkgEl)return;
+    e.preventDefault();
+    const p=pkgs.find(q=>q.id===pkgEl.id);
+    if(!p||p.sc||p.dead)return;
+    const touch=e.touches[0];
+    const r=pkgEl.getBoundingClientRect();
+    touchOffX=touch.clientX-r.left;
+    touchOffY=touch.clientY-r.top;
+    touchDragPkg=p;
+    touchDragEl=pkgEl;
+    selectedPkg=p;
+    pkgEl.style.position='fixed';
+    pkgEl.style.zIndex='200';
+    pkgEl.style.left=(touch.clientX-touchOffX)+'px';
+    pkgEl.style.top=(touch.clientY-touchOffY)+'px';
+    pkgEl.style.transform='none';
+    pkgEl.style.opacity='0.85';
+    pkgEl.classList.add('SELECTED');
+    updTouchHint('selected');
+    if(!muted)SFX.pick();
+    /* highlight all bins */
+    ['bin_N','bin_B','bin_P'].forEach(b=>$(b)&&$(b).classList.add('TAP_READY'));
+  },{passive:false});
+
+  document.addEventListener('touchmove',e=>{
+    if(!touchDragEl)return;
+    e.preventDefault();
+    const touch=e.touches[0];
+    touchDragEl.style.left=(touch.clientX-touchOffX)+'px';
+    touchDragEl.style.top=(touch.clientY-touchOffY)+'px';
+    /* highlight bin under finger */
+    const def=getBinAtPoint(touch.clientX,touch.clientY);
+    ['bin_N','bin_B','bin_P'].forEach(b=>{
+      const el=$(b);if(!el)return;
+      el.classList.toggle('OV',b==='bin_'+def);
+    });
+  },{passive:false});
+
+  document.addEventListener('touchend',e=>{
+    ['bin_N','bin_B','bin_P'].forEach(b=>{
+      const el=$(b);if(el){el.classList.remove('OV');el.classList.remove('TAP_READY');}
+    });
+    if(!touchDragEl){
+      /* tap on a bin when package selected (no drag) */
+      const tgt=e.target.closest('.BIN_3D');
+      if(tgt&&selectedPkg){
+        const def=tgt.id.replace('bin_','');
+        doSort(def);
+      } else if(!e.target.closest('.PKG')&&!e.target.closest('.BIN_3D')){
+        /* tap empty area — deselect */
+        if(selectedPkg){
+          const el=$(selectedPkg.id);
+          if(el){el.classList.remove('SELECTED');el.style.opacity='1';}
+          selectedPkg=null;updTouchHint(null);
+        }
+      }
+      return;
+    }
+    /* dropped — check if over a bin */
+    const touch=e.changedTouches[0];
+    const def=getBinAtPoint(touch.clientX,touch.clientY);
+    if(touchDragEl){
+      touchDragEl.classList.remove('SELECTED');
+      touchDragEl.style.position='absolute';
+      touchDragEl.style.zIndex='6';
+      touchDragEl.style.opacity='1';
+      touchDragEl.style.transform='translateY(-50%)';
+      touchDragEl.style.left=touchDragPkg?touchDragPkg.x+'px':'0';
+      touchDragEl.style.top='50%';
+    }
+    if(def){
+      doSort(def);
+    } else {
+      /* dropped outside bin — deselect */
+      touchDragPkg=null; touchDragEl=null; selectedPkg=null;
+      updTouchHint(null);
+    }
+    touchDragEl=null; touchDragPkg=null;
+  },{passive:false});
+
+  /* roller speed interval */
+  setInterval(()=>{
+    if(!lc)return;
+    const fast=lc.spd>=7, vfast=lc.spd>=11;
+    [$('ROLLER_L'),$('ROLLER_R')].forEach(r=>{
+      if(!r)return;
+      r.classList.toggle('roller-vfast',vfast);
+      r.classList.toggle('roller-fast',fast&&!vfast);
+    });
+  },2000);
+});
+
+function bov(e,bid){e.preventDefault();$(bid).classList.add('OV')}
+function blv(bid){$(bid).classList.remove('OV')}
+function bdp(e,bdef){
+  e.preventDefault();
+  ['bin_N','bin_B','bin_P'].forEach(b=>$(b).classList.remove('OV'));
+  if(!dg)return;
+  const p=pkgs.find(q=>q.id===dg.id);
+  if(!p||p.sc||p.dead)return;
+  p.sc=true;
+  const el=$(p.id);
+  if(p.def===null){
+    combo=0;updC();if(!muted)SFX.wrong();pts(-5,'−5 CLEAN PKG!',el,false);
+  } else if(p.def===bdef){
+    crt++;combo++;
+    const bon=combo>=3?5:0;
+    if(!muted){if(bon>0)SFX.combo();else SFX.correct();}
+    animateBinFill(bdef);
+    pts(5+bon,bon?'+'+(5+bon)+' COMBO!':'+5',el,true);
+    updC();
+  } else {
+    combo=0;updC();if(!muted)SFX.wrong();pts(-5,'−5 WRONG BIN',el,false);
+  }
+  if(el)setTimeout(()=>el.remove(),15);
+  pkgs=pkgs.filter(q=>q.id!==p.id);
+  dg=null;
+}
+
+/* ─── SCORE ─────────────────────────────── */
+function pts(p_,lbl,anchor,good){
+  gs.sc=Math.max(0,gs.sc+p_);updH();updBar();
+  const fb=document.createElement('div');
+  fb.className='FLOAT';
+  fb.style.color=good?'#4ade80':'#f87171';
+  const gr=$('G').getBoundingClientRect();
+  if(anchor){
+    try{
+      const r=anchor.getBoundingClientRect();
+      if(r.width>0){fb.style.left=(r.left-gr.left+r.width/2-36)+'px';fb.style.top=(r.top-gr.top-6)+'px';}
+      else{fb.style.left='45%';fb.style.top='80px';}
+    }catch(_){fb.style.left='45%';fb.style.top='80px';}
+  }else{fb.style.left='45%';fb.style.top='80px';}
+  fb.textContent=lbl;
+  $('G').appendChild(fb);
+  setTimeout(()=>fb.remove(),900);
+}
+
+function updH(){
+  $('hs').textContent=gs.sc;
+  $('hlv_v').textContent=gs.lvl;
+  $('ht_v').textContent=gs.time;
+  $('htg_v').textContent=lc?lc.tgt:'--';
+}
+function updBar(){
+  if(!lc)return;
+  $('PROG_FILL').style.width=Math.min(100,Math.round(gs.sc/lc.tgt*100))+'%';
+  $('PROG_TXT').textContent=gs.sc+' / '+lc.tgt+' pts';
+}
+function updC(){
+  $('COMBO_TXT').textContent=combo>=3?'COMBO x'+combo+'  (+5)':'';
+}
+
+/* ─── ANNOUNCE ──────────────────────────── */
+function showAnnounce(shift,title,sub,cb){
+  const ann=$('ANNOUNCE');
+  $('ANN_SHIFT').textContent=shift;
+  $('ANN_TITLE').textContent=title;
+  $('ANN_SUB').textContent=sub;
+  ann.classList.remove('H');
+  /* reset animations */
+  [$('ANN_SHIFT'),$('ANN_TITLE'),$('ANN_SUB')].forEach(el=>{
+    el.style.animation='none';void el.offsetWidth;el.style.animation='';
+  });
+  setTimeout(()=>{ann.classList.add('H');if(cb)cb();},2200);
+}
+
+/* ─── END GAME ──────────────────────────── */
+function endGame(win){
+  stop();
+  const grade=gs.sc>=1900?'S':gs.sc>=1180?'A':gs.sc>=700?'B':gs.sc>=380?'C':'D';
+  const gc={S:'#ffd700',A:'#00b8ff',B:'#4ade80',C:'#fbbf24',D:'#f87171'}[grade];
+  $('end_badge').textContent=win?'SHIFT COMPLETE — WELL DONE':'SHIFT FAILED — TRY AGAIN';
+  $('end_title').textContent=win?'YOU PASSED!':'NOT ENOUGH';
+  $('end_title').style.color=win?'#00b8ff':'#f87171';
+  $('end_score').textContent=gs.sc;
+  $('end_grade').textContent=grade;
+  $('end_grade').style.color=gc;
+  $('end_stats').innerHTML=
+    'Shift reached: <strong>'+gs.lvl+' of '+LVS.length+'</strong><br>'+
+    'Correct sorts: <strong style="color:#4ade80">'+crt+'</strong><br>'+
+    'Missed defects: <strong style="color:#f87171">'+msd+'</strong><br>'+
+    'Clean packages passed: <strong style="color:#4ade80">'+clp+'</strong>';
+  if(!muted) SFX.end(win);
+  show('OVS');
+}
+
+/* ─── SOUND ENGINE — FACTORY VIBES ─────────── */
+const SFX = (() => {
+  let ctx = null;
+  let bgNode = null, bgGain = null;
+
+  function init() {
+    if (ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function out(vol=0.3) {
+    if(!ctx) return null;
+    const g = ctx.createGain();
+    g.gain.value = vol;
+    g.connect(ctx.destination);
+    return g;
+  }
+
+  function osc(freq, type, vol, endVol, dur, t, dest) {
+    if(!ctx||!dest) return;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0001,endVol), t+dur);
+    o.connect(g); g.connect(dest);
+    o.start(t); o.stop(t+dur+0.02);
+  }
+
+  function noiseFilter(durSec, vol, filterFreq, filterQ, dest, t) {
+    if(!ctx||!dest) return;
+    const len = Math.ceil(ctx.sampleRate * durSec);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = filterFreq; f.Q.value = filterQ;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+durSec);
+    src.connect(f); f.connect(g); g.connect(dest);
+    src.start(t); src.stop(t+durSec+0.01);
+  }
+
+  /* ── AMBIENT FACTORY HUM — low machinery drone ── */
+  function startHum() {
+    init();
+    if(!ctx || bgNode) return;
+    bgGain = ctx.createGain();
+    bgGain.gain.value = 0.0;
+    bgGain.connect(ctx.destination);
+
+    const rumble = ctx.createOscillator();
+    rumble.type = 'sawtooth'; rumble.frequency.value = 48;
+    const rumbleGain = ctx.createGain(); rumbleGain.gain.value = 0.04;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 120;
+    rumble.connect(lp); lp.connect(rumbleGain); rumbleGain.connect(bgGain);
+    rumble.start();
+
+    const hum = ctx.createOscillator();
+    hum.type = 'square'; hum.frequency.value = 96;
+    const humGain = ctx.createGain(); humGain.gain.value = 0.025;
+    const lp2 = ctx.createBiquadFilter();
+    lp2.type = 'lowpass'; lp2.frequency.value = 200;
+    hum.connect(lp2); lp2.connect(humGain); humGain.connect(bgGain);
+    hum.start();
+
+    const whine = ctx.createOscillator();
+    whine.type = 'sine'; whine.frequency.value = 340;
+    const whineGain = ctx.createGain(); whineGain.gain.value = 0.015;
+    whine.connect(whineGain); whineGain.connect(bgGain);
+    whine.start();
+
+    bgNode = rumble;
+    bgGain.gain.setValueAtTime(0, ctx.currentTime);
+    bgGain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 1.5);
+  }
+
+  function stopHum() {
+    if(!ctx || !bgGain) return;
+    try {
+      bgGain.gain.cancelScheduledValues(ctx.currentTime);
+      bgGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.0);
+    } catch(_){}
+    setTimeout(()=>{ bgNode=null; bgGain=null; }, 1200);
+  }
+
+  return {
+
+    startHum,
+    stopHum,
+
+    /* ⏰ Countdown tick — sharp clock click for last 10 seconds */
+    tick() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.20);
+      osc(1800, 'square', 0.4, 0.001, 0.04, t, d);
+      noiseFilter(0.03, 0.2, 3000, 5, d, t);
+    },
+
+    /* 🤚 Package picked up — cardboard scrape + lift */
+    pick() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.18);
+      /* cardboard friction scrape */
+      noiseFilter(0.08, 0.5, 2400, 3, d, t);
+      noiseFilter(0.06, 0.3, 1200, 2, d, t+0.02);
+      /* small lift thud */
+      osc(200, 'triangle', 0.25, 0.001, 0.07, t+0.06, d);
+    },
+
+    /* 📦 Package arrives on belt — mechanical thud + roller clunk */
+    spawn() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.22);
+      /* low impact thud */
+      osc(80, 'sine', 0.8, 0.001, 0.12, t, d);
+      osc(55, 'triangle', 0.5, 0.001, 0.18, t, d);
+      /* roller click */
+      noiseFilter(0.05, 0.3, 1200, 2, d, t);
+      noiseFilter(0.03, 0.2, 400,  1, d, t+0.02);
+    },
+
+    /* 🏭 Belt clunk — continuous belt movement tick (called periodically) */
+    beltTick() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.06);
+      noiseFilter(0.03, 0.4, 600, 3, d, t);
+      osc(95, 'square', 0.08, 0.001, 0.04, t, d);
+    },
+
+    /* ✅ Correct sort — scanner beep like a real barcode reader */
+    correct() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.25);
+      /* sharp scanner double-beep */
+      osc(1200, 'sine', 0.5, 0.001, 0.07, t,      d);
+      osc(1400, 'sine', 0.4, 0.001, 0.06, t+0.09, d);
+    },
+
+    /* ✅ Clean package passed — soft approval beep */
+    pass() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.18);
+      osc(800, 'sine', 0.35, 0.001, 0.08, t, d);
+    },
+
+    /* 🎯 Combo — rapid triple scanner beep */
+    combo() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.28);
+      [1200,1400,1800].forEach((f,i)=>{
+        osc(f, 'sine', 0.5, 0.001, 0.07, t+i*0.07, d);
+      });
+    },
+
+    /* ❌ Wrong bin — industrial buzzer / alarm klaxon */
+    wrong() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.30);
+      /* klaxon — two-tone alarm */
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(440, t);
+      o.frequency.setValueAtTime(330, t+0.1);
+      o.frequency.setValueAtTime(440, t+0.2);
+      g.gain.setValueAtTime(0.4, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+0.32);
+      o.connect(g); g.connect(d);
+      o.start(t); o.stop(t+0.33);
+      /* metallic clang */
+      noiseFilter(0.08, 0.25, 2000, 0.5, d, t);
+    },
+
+    /* ❌ Defect missed — heavy conveyor thud + alarm ping */
+    missed() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.28);
+      /* heavy thud */
+      osc(60,  'sine',     0.9, 0.001, 0.22, t,      d);
+      osc(45,  'triangle', 0.6, 0.001, 0.28, t,      d);
+      /* warning ping */
+      osc(880, 'sine',     0.3, 0.001, 0.14, t+0.05, d);
+      noiseFilter(0.1, 0.2, 500, 1, d, t);
+    },
+
+    /* 🔧 Stamping / hydraulic press — level transition whoosh */
+    levelUp() {
+      init();
+      const t = ctx.currentTime;
+      const d = out(0.30);
+      /* hydraulic hiss */
+      noiseFilter(0.5, 0.5, 800, 0.8, d, t);
+      noiseFilter(0.3, 0.3, 300, 0.5, d, t+0.1);
+      /* mechanical clunk at end */
+      osc(120, 'sine',  0.7, 0.001, 0.15, t+0.4, d);
+      osc(90,  'triangle',0.5,0.001,0.18, t+0.4, d);
+      /* confirmation tone */
+      [440,550,660,880].forEach((f,i)=>{
+        osc(f, 'sine', 0.3, 0.001, 0.12, t+0.55+i*0.07, d);
+      });
+    },
+
+    /* 🏆 / 💀 End game */
+    end(win) {
+      init(); stopHum();
+      const t = ctx.currentTime;
+      const d = out(0.28);
+      if(win){
+        /* factory horn blast + fanfare */
+        const horn = ctx.createOscillator();
+        const hg = ctx.createGain();
+        horn.type = 'sawtooth'; horn.frequency.value = 220;
+        hg.gain.setValueAtTime(0.0001, t);
+        hg.gain.linearRampToValueAtTime(0.5, t+0.05);
+        hg.gain.setValueAtTime(0.5, t+0.3);
+        hg.gain.exponentialRampToValueAtTime(0.0001, t+0.55);
+        horn.connect(hg); hg.connect(d);
+        horn.start(t); horn.stop(t+0.56);
+        /* celebratory tones */
+        [[523,0.6],[659,0.75],[784,0.9],[1047,1.1],[784,1.3],[1047,1.5]].forEach(([f,delay])=>{
+          osc(f,'sine',0.45,0.001,0.2,t+delay,d);
+        });
+      } else {
+        /* power-down groan */
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(180, t);
+        o.frequency.exponentialRampToValueAtTime(40, t+1.2);
+        g.gain.setValueAtTime(0.5, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t+1.3);
+        o.connect(g); g.connect(d);
+        o.start(t); o.stop(t+1.4);
+        noiseFilter(0.8, 0.2, 200, 0.5, d, t+0.3);
+      }
+    }
+  };
+})();
+
+/* ── BELT TICK INTERVAL ─────────────────────── */
+let beltTickInterval = null;
+function startBeltAmbience(){
+  SFX.startHum();
+  clearInterval(beltTickInterval);
+  beltTickInterval = setInterval(()=>{
+    if(run&&!paused&&!muted) SFX.beltTick();
+  }, 800 + Math.random()*400);
+}
+function stopBeltAmbience(){
+  clearInterval(beltTickInterval);
+  beltTickInterval = null;
+  SFX.stopHum();
+}
+
+/* unlock audio on first interaction */
+document.addEventListener('click', () => {
+  if (!window._audioUnlocked) {
+    window._audioUnlocked = true;
+    try {
+      const tmp = new (window.AudioContext || window.webkitAudioContext)();
+      tmp.resume().then(() => tmp.close());
+    } catch(_){}
+  }
+}, {once:true});
+
+/* wire all buttons reliably after DOM ready */
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('btn_continue').addEventListener('click', function(){ show('TSCREEN'); });
+});
+</script>
+</body>
+</html>
